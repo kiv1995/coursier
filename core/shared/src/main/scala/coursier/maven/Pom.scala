@@ -253,6 +253,7 @@ object Pom {
         profiles,
         None,
         None,
+        packagingOpt(pom),
         None,
         Nil,
         Info(

@@ -133,6 +133,7 @@ object FromSbt {
       None,
       None,
       None,
+      None,
       Nil,
       Info.empty
     )

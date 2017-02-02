@@ -114,46 +114,22 @@ final case class MavenSource(
 
       case None =>
 
-        val publications =
-          if (dependency.attributes.classifier.nonEmpty)
-            // FIXME We're ignoring dependency.attributes.`type` in this case
-            project.publications.collect {
-              case (_, p) if p.classifier == dependency.attributes.classifier =>
-                p
-            }
-          else if (dependency.attributes.`type`.nonEmpty)
-            project.publications.collect {
-              case (_, p) if p.`type` == dependency.attributes.`type` =>
-                p
-            }
-          else
-            project.publications.collect {
-              case (_, p) if p.classifier.isEmpty =>
-                p
-            }
-
-        // See comment above
-        if (publications.isEmpty) {
-          val type0 = if (dependency.attributes.`type`.isEmpty) "jar" else dependency.attributes.`type`
-
-          val extension = MavenSource.typeExtension(type0)
-
-          val classifier =
-            if (dependency.attributes.classifier.isEmpty)
-              MavenSource.typeDefaultClassifier(type0)
-            else
-              dependency.attributes.classifier
-
-          Seq(
-            Publication(
-              dependency.module.name,
-              type0,
-              extension,
-              classifier
-            )
-          )
-        } else
-          publications
+        if (dependency.attributes.classifier.nonEmpty)
+          // FIXME We're ignoring dependency.attributes.`type` in this case
+          project.publications.collect {
+            case (_, p) if p.classifier == dependency.attributes.classifier =>
+              p
+          }
+        else if (dependency.attributes.`type`.nonEmpty)
+          project.publications.collect {
+            case (_, p) if p.`type` == dependency.attributes.`type` =>
+              p
+          }
+        else
+          project.publications.collect {
+            case (_, p) if p.classifier.isEmpty =>
+              p
+          }
     }
 
     publications0.map(artifactWithExtra)
@@ -193,5 +169,23 @@ object MavenSource {
 
   def typeDefaultClassifier(`type`: String): String =
     typeDefaultClassifierOpt(`type`).getOrElse("")
+
+  val classifierExtensionDefaultTypes: Map[(String, String), String] = Map(
+    ("tests", "jar")   -> "test-jar",
+    ("javadoc", "jar") -> "doc",
+    ("sources", "jar") -> "src"
+    // don't know much about "client" classifier, not including it here
+  )
+
+  def classifierExtensionDefaultTypeOpt(classifier: String, ext: String): Option[String] =
+    classifierExtensionDefaultTypes.get((classifier, ext))
+
+  val typeDefaultConfigs: Map[String, String] = Map(
+    "doc" -> "docs",
+    "src" -> "sources"
+  )
+
+  def typeDefaultConfig(`type`: String): Option[String] =
+    typeDefaultConfigs.get(`type`)
 
 }

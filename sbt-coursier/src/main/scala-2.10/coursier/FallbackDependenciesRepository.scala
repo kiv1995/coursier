@@ -121,6 +121,7 @@ final case class FallbackDependenciesRepository(
                 None,
                 None,
                 None,
+                None,
                 Nil,
                 Info.empty
               )
